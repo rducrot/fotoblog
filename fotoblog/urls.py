@@ -29,4 +29,5 @@ urlpatterns = [
                                        next_page='login'),
          name='logout'),
     path('home/', blog.views.home, name='home'),
+    path('signup/', authentication.views.signup_page, name='signup'),
 ]
