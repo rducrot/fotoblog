@@ -5,6 +5,29 @@ from . import forms, models
 
 
 @login_required
+def edit_blog(request, blog_id):
+    blog = get_object_or_404(models.Blog, id=blog_id)
+    edit_form = forms.BlogForm(instance=blog)
+    delete_form = forms.DeleteBlogForm()
+    if request.method == 'POST':
+        if 'edit_blog' in request.POST:
+            edit_form = forms.BlogForm(request.POST, instance=blog)
+            if edit_form.is_valid():
+                edit_form.save()
+                return redirect('home')
+        if 'delete_blog' in request.POST:
+            delete_form = forms.DeleteBlogForm(request.POST)
+            if delete_form.is_valid():
+                blog.delete()
+                return redirect('home')
+    context = {
+        'edit_form': edit_form,
+        'delete_form': delete_form,
+    }
+    return render(request, 'blog/edit_blog.html', context=context)
+
+
+@login_required
 def view_blog(request, blog_id):
     blog = get_object_or_404(models.Blog, id=blog_id)
     return render(request, "blog/view_blog.html",
