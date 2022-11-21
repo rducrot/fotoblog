@@ -1,6 +1,7 @@
 from itertools import chain
 
 from django.contrib.auth.decorators import login_required, permission_required
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.forms import formset_factory
 from django.shortcuts import redirect, render, get_object_or_404
@@ -108,8 +109,14 @@ def home(request):
     blog_and_photos = sorted(chain(blogs, photos),
                              key=lambda instance: instance.date_created,
                              reverse=True)
+
+    paginator = Paginator(blog_and_photos, 6)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {'page_obj': page_obj}
     return render(request, 'blog/home.html',
-                  context={"blogs_and_photos": blog_and_photos})
+                  context=context)
 
 
 @login_required
@@ -127,5 +134,10 @@ def follow_users(request):
 def photo_feed(request):
     photos = models.Photo.objects.filter(
         uploader__in=request.user.follows.all()).order_by('-date_created')
-    context = {'photos': photos}
+
+    paginator = Paginator(photos, 6)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {'page_obj': page_obj}
     return render(request, 'blog/photo_feed.html', context=context)
