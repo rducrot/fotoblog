@@ -126,6 +126,6 @@ def follow_users(request):
 @login_required
 def photo_feed(request):
     photos = models.Photo.objects.filter(
-        uploader__in=request.user.follows.all().order_by('-date_created'))
-    return render(request, 'blog/photo_feed.html',
-                  {'photos': photos})
+        uploader__in=request.user.follows.all()).order_by('-date_created')
+    context = {'photos': photos}
+    return render(request, 'blog/photo_feed.html', context=context)
